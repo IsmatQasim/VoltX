@@ -67,7 +67,7 @@ export default function Signup() {
     });
 
     alert(
-      'A verification email has been sent to your inbox. Please verify to continue.'
+      'A verification email has been sent to your inbox(Spam). Please verify to continue.'
     );
     
     await auth().signOut();
