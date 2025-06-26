@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderTopWidth: 1,
     borderColor: colors.secondary,
-    backgroundColor:colors.accent,
+    backgroundColor:colors.secondary,
   },
   bottomItem: { alignItems: 'center' },
   bottomText: { fontSize: 11, marginTop: 4 },

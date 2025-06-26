@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,11 +12,29 @@ import { useNavigation } from '@react-navigation/native';
 import Button from '../components/button';
 import colors from '../contants/colors.js';
 import auth from '@react-native-firebase/auth';
- import database from '@react-native-firebase/database';
+import database from '@react-native-firebase/database';
+
 export default function Login() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  useEffect(() => {
+  const unsubscribe = auth().onAuthStateChanged(async (user) => {
+    if (user) {
+      await user.reload();
+      if (user.emailVerified && navigation.isReady()) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'HomeProfile' }],
+        });
+      }
+    }
+  });
+
+  return unsubscribe;
+}, [navigation]);
+
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -25,15 +43,24 @@ export default function Login() {
     }
 
     try {
-      const userCredential = await auth().signInWithEmailAndPassword(email, password);
+      const userCredential = await auth().signInWithEmailAndPassword(
+        email,
+        password,
+      );
       const user = auth().currentUser;
-      await user.reload(); 
+      await user.reload();
 
       if (user && user.emailVerified) {
         database().ref(`/users/${user.uid}`).update({ emailVerified: true });
-        navigation.navigate('Dashboard');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'HomeProfile' }],
+        });
       } else {
-        Alert.alert('Email Not Verified', 'Please verify your email before logging in.');
+        Alert.alert(
+          'Email Not Verified',
+          'Please verify your email before logging in.',
+        );
         await auth().signOut();
       }
     } catch (error) {
