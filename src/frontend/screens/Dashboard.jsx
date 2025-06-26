@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   featureBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.accent,
+    backgroundColor: colors.secondary,
     padding: 9,
     borderRadius: 12,
     width: '48.5%',
