@@ -13,66 +13,94 @@ import Button from '../components/button';
 import colors from '../contants/colors.js';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 export default function Login() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [secureText, setSecureText] = useState(true);
 
   useEffect(() => {
-  const unsubscribe = auth().onAuthStateChanged(async (user) => {
-    if (user) {
-      await user.reload();
-      if (user.emailVerified && navigation.isReady()) {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'HomeProfile' }],
-        });
+    const unsubscribe = auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        await user.reload();
+        if (user.emailVerified && navigation.isReady()) {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'HomeProfile' }],
+          });
+        }
       }
-    }
-  });
+    });
 
-  return unsubscribe;
-}, [navigation]);
-
+    return unsubscribe;
+  }, [navigation]);
 
   const handleLogin = async () => {
-    if (!email.trim() || !password.trim()) {
-      Alert.alert('Validation Error', 'Please enter both email and password.');
+  if (!email.trim() || !password.trim()) {
+    Alert.alert('Missing Information', 'Please enter both email and password.');
+    return;
+  }
+
+  try {
+    const userCredential = await auth().signInWithEmailAndPassword(email, password);
+    const user = auth().currentUser;
+    await user.reload();
+
+    if (user && user.emailVerified) {
+      database().ref(`/users/${user.uid}`).update({ emailVerified: true });
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'HomeProfile' }],
+      });
+    } else {
+      Alert.alert(
+        'Email Not Verified',
+        'Please check your email inbox and verify your email before logging in.'
+      );
+      await auth().signOut();
+    }
+  } catch (error) {
+    let message = '';
+    switch (error.code) {
+      case 'auth/user-not-found':
+        message = 'No account found with this email.';
+        break;
+      case 'auth/wrong-password':
+        message = 'The password you entered is incorrect.';
+        break;
+      case 'auth/invalid-email':
+        message = 'The email address is invalid.';
+        break;
+      case 'auth/network-request-failed':
+        message = 'Network error. Please check your connection.';
+        break;
+      default:
+        message = 'Login failed. Please try again.';
+    }
+
+    Alert.alert('Login Error', message);
+  }
+};
+
+  const handleForgotPassword = () => {
+    if (!email.trim()) {
+      Alert.alert('Forgot Password', 'Please enter your email address first.');
       return;
     }
 
-    try {
-      const userCredential = await auth().signInWithEmailAndPassword(
-        email,
-        password,
-      );
-      const user = auth().currentUser;
-      await user.reload();
-
-      if (user && user.emailVerified) {
-        database().ref(`/users/${user.uid}`).update({ emailVerified: true });
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'HomeProfile' }],
-        });
-      } else {
+    auth()
+      .sendPasswordResetEmail(email)
+      .then(() => {
         Alert.alert(
-          'Email Not Verified',
-          'Please verify your email before logging in.',
+          'Password Reset',
+          'A password reset link has been sent to your email(Spam).'
         );
-        await auth().signOut();
-      }
-    } catch (error) {
-      if (
-        error.code === 'auth/user-not-found' ||
-        error.code === 'auth/wrong-password'
-      ) {
-        Alert.alert('Login Failed', 'Incorrect email or password.');
-      } else {
-        Alert.alert('Login Error', error.message);
-      }
-    }
+      })
+      .catch((error) => {
+        Alert.alert('Error', error.message);
+      });
   };
 
   return (
@@ -97,6 +125,7 @@ export default function Login() {
         <Text style={styles.heading}>Login</Text>
       </View>
 
+      {/* Email */}
       <View style={styles.inputContainer}>
         <Image
           source={{
@@ -113,6 +142,7 @@ export default function Login() {
         />
       </View>
 
+      {/* Password + Eye Icon */}
       <View style={styles.inputContainer}>
         <Image
           source={{
@@ -123,18 +153,28 @@ export default function Login() {
         <TextInput
           placeholder="Password"
           placeholderTextColor="#000"
-          secureTextEntry
+          secureTextEntry={secureText}
           style={styles.input}
           value={password}
           onChangeText={setPassword}
         />
+        <TouchableOpacity onPress={() => setSecureText(!secureText)}>
+          <MaterialIcons
+            name={secureText ? 'visibility-off' : 'visibility'}
+            size={22}
+            color="#555"
+          />
+        </TouchableOpacity>
       </View>
 
-      <TouchableOpacity>
+      {/* Forgot Password */}
+      <TouchableOpacity onPress={handleForgotPassword}>
         <Text style={styles.forgot}>Forgot Password?</Text>
       </TouchableOpacity>
 
       <Button text="Login" onPress={handleLogin} buttonStyle={{ width: 200 }} />
+
+      {/* Signup Link */}
       <Text style={styles.linkText}>
         Don’t have an account?{' '}
         <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
