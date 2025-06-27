@@ -18,9 +18,10 @@ export const APPLIANCES = [
   { label: 'Washing Machine', icon: 'washing-machine' },
   { label: 'Motor', icon: 'engine-outline' },
   { label: 'Microwave', icon: 'microwave' },
+   { label: 'TV', icon: 'television' },
+   { label: 'Computer', icon: 'laptop' },
 ];
 
-// Helper function to render icon when needed
 export const renderIcon = (iconName, size = 22, color = 'black') => (
   <MaterialCommunityIcons name={iconName} size={size} color={color} />
 );

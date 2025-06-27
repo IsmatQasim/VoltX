@@ -14,6 +14,7 @@ import colors from '../contants/colors.js';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import firestore from '@react-native-firebase/firestore';
 
 export default function Login() {
   const navigation = useNavigation();
@@ -22,14 +23,37 @@ export default function Login() {
   const [secureText, setSecureText] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(async (user) => {
+    const unsubscribe = auth().onAuthStateChanged(async user => {
       if (user) {
         await user.reload();
         if (user.emailVerified && navigation.isReady()) {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'HomeProfile' }],
-          });
+          // Check HomeProfile data here too
+          try {
+            const doc = await firestore()
+              .collection('UserHomeProfile')
+              .doc(user.uid)
+              .get({ source: 'server' });
+
+            const hasValidData =
+              doc.exists && doc.data() && Object.keys(doc.data()).length > 0;
+
+            if (hasValidData) {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Dashboard' }],
+              });
+            } else {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'HomeProfile' }],
+              });
+            }
+          } catch (error) {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'HomeProfile' }],
+            });
+          }
         }
       }
     });
@@ -38,51 +62,87 @@ export default function Login() {
   }, [navigation]);
 
   const handleLogin = async () => {
-  if (!email.trim() || !password.trim()) {
-    Alert.alert('Missing Information', 'Please enter both email and password.');
-    return;
-  }
-
-  try {
-    const userCredential = await auth().signInWithEmailAndPassword(email, password);
-    const user = auth().currentUser;
-    await user.reload();
-
-    if (user && user.emailVerified) {
-      database().ref(`/users/${user.uid}`).update({ emailVerified: true });
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'HomeProfile' }],
-      });
-    } else {
+    if (!email.trim() || !password.trim()) {
       Alert.alert(
-        'Email Not Verified',
-        'Please check your email inbox and verify your email before logging in.'
+        'Missing Information',
+        'Please enter both email and password.',
       );
-      await auth().signOut();
-    }
-  } catch (error) {
-    let message = '';
-    switch (error.code) {
-      case 'auth/user-not-found':
-        message = 'No account found with this email.';
-        break;
-      case 'auth/wrong-password':
-        message = 'The password you entered is incorrect.';
-        break;
-      case 'auth/invalid-email':
-        message = 'The email address is invalid.';
-        break;
-      case 'auth/network-request-failed':
-        message = 'Network error. Please check your connection.';
-        break;
-      default:
-        message = 'Login failed. Please try again.';
+      return;
     }
 
-    Alert.alert('Login Error', message);
-  }
-};
+    try {
+      const userCredential = await auth().signInWithEmailAndPassword(
+        email,
+        password,
+      );
+      const user = auth().currentUser;
+      await user.reload();
+
+      if (user && user.emailVerified) {
+        database().ref(`/users/${user.uid}`).update({ emailVerified: true });
+
+        try {
+          const doc = await firestore()
+            .collection('UserHomeProfile')
+            .doc(user.uid)
+            .get({ source: 'server' });
+
+          const hasValidData =
+            doc.exists && doc.data() && Object.keys(doc.data()).length > 0;
+
+          if (hasValidData) {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Dashboard' }],
+            });
+          } else {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'HomeProfile' }],
+            });
+          }
+        } catch (firestoreError) {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'HomeProfile' }],
+          });
+        }
+      } else {
+        Alert.alert(
+          'Email Not Verified',
+          'Please check your email inbox and verify your email before logging in.',
+        );
+        await auth().signOut();
+      }
+    } catch (error) {
+      let message = '';
+      switch (error.code) {
+        case 'auth/user-not-found':
+          message = 'No account found with this email.';
+          break;
+        case 'auth/wrong-password':
+          message = 'The password you entered is incorrect.';
+          break;
+        case 'auth/invalid-email':
+          message = 'The email address is invalid.';
+          break;
+        case 'auth/network-request-failed':
+          message = 'Network error. Please check your connection.';
+          break;
+        case 'auth/invalid-credential':
+          message =
+            'Invalid credentials. Please check your email and password.';
+          break;
+        case 'auth/too-many-requests':
+          message = 'Too many failed attempts. Please try again later.';
+          break;
+        default:
+          message = 'Login failed. Please try again.';
+      }
+
+      Alert.alert('Login Error', message);
+    }
+  };
 
   const handleForgotPassword = () => {
     if (!email.trim()) {
@@ -95,11 +155,22 @@ export default function Login() {
       .then(() => {
         Alert.alert(
           'Password Reset',
-          'A password reset link has been sent to your email(Spam).'
+          'A password reset link has been sent to your email. Please check your inbox and spam folder.',
         );
       })
-      .catch((error) => {
-        Alert.alert('Error', error.message);
+      .catch(error => {
+        let message = '';
+        switch (error.code) {
+          case 'auth/user-not-found':
+            message = 'No account found with this email address.';
+            break;
+          case 'auth/invalid-email':
+            message = 'The email address is invalid.';
+            break;
+          default:
+            message = error.message;
+        }
+        Alert.alert('Error', message);
       });
   };
 
@@ -139,6 +210,9 @@ export default function Login() {
           style={styles.input}
           value={email}
           onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
         />
       </View>
 
@@ -157,6 +231,8 @@ export default function Login() {
           style={styles.input}
           value={password}
           onChangeText={setPassword}
+          autoCapitalize="none"
+          autoCorrect={false}
         />
         <TouchableOpacity onPress={() => setSecureText(!secureText)}>
           <MaterialIcons
@@ -176,7 +252,7 @@ export default function Login() {
 
       {/* Signup Link */}
       <Text style={styles.linkText}>
-        Don’t have an account?{' '}
+        Don't have an account?{' '}
         <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
           <Text style={styles.link}>Sign Up</Text>
         </TouchableOpacity>

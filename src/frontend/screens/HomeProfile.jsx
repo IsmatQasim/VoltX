@@ -538,7 +538,7 @@ const HomeProfile = () => {
 
       {canShowAppliances && (
         <View style={styles.buttonContainer}>
-          <Button text="Next" onPress={handleNext} />
+          <Button text="     Next     " onPress={handleNext} />
         </View>
       )}
     </ScrollView>
