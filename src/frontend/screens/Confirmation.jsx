@@ -358,7 +358,7 @@ const Confirmation = () => {
 
       <View style={styles.buttonContainer}>
         <Button
-          text="Confirm"
+          text="   Confirm   "
           onPress={handleConfirm}
           disabled={!canProceed}
           style={!canProceed && styles.disabledButton}

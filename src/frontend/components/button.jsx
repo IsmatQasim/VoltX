@@ -13,11 +13,16 @@ export default function Button({ text, onPress, buttonStyle }) {
 const styles = StyleSheet.create({
   loginBtn: {
     backgroundColor: colors.secondary,
-    padding: 15,
+    padding: 14,
+    borderColor:colors.accent,
+    borderWidth:0.8,
+    borderBottomWidth:5,
     borderRadius: 25,
     alignItems: 'center',
     marginBottom: 20,
+    marginTop:20,
     alignSelf: 'center',
+    elevation: 5,
   },
   loginText: {
     fontSize: 18,
