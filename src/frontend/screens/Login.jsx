@@ -131,7 +131,7 @@ export default function Login() {
           break;
         case 'auth/invalid-credential':
           message =
-            'Invalid credentials. Please check your email and password.';
+            'Invalid credentials. Please check your email and password or User does not exist';
           break;
         case 'auth/too-many-requests':
           message = 'Too many failed attempts. Please try again later.';
