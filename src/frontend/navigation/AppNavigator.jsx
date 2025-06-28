@@ -6,6 +6,8 @@ import Login from '../screens/Login';
 import Dashboard from '../screens/Dashboard';
 import HomeProfile from '../screens/HomeProfile';
 import Confirmation from '../screens/Confirmation';
+import Settings from '../screens/Settings';
+import Account from '../screens/Account';
 import { DeviceProvider } from '../context/DeviceContext';
 
 
@@ -25,6 +27,8 @@ export default function AppNavigator() {
       <Stack.Screen name="HomeProfile" component={HomeProfile} />
           <Stack.Screen name="Confirmation" component={Confirmation} />
       <Stack.Screen name="Dashboard" component={Dashboard} />
+      <Stack.Screen name="Settings" component={Settings} />
+      <Stack.Screen name="Account" component={Account} />
     </Stack.Navigator>
         </DeviceProvider>
 
