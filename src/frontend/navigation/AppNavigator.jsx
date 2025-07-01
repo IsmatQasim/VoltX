@@ -9,7 +9,8 @@ import Confirmation from '../screens/Confirmation';
 import Settings from '../screens/Settings';
 import Account from '../screens/Account';
 import { DeviceProvider } from '../context/DeviceContext';
-
+import RemoteControl from '../screens/RemoteControl';
+import { ScheduleOn, ScheduleOff } from '../screens/Schedule'
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,9 @@ export default function AppNavigator() {
       <Stack.Screen name="Dashboard" component={Dashboard} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="Account" component={Account} />
+      <Stack.Screen name="RemoteControl" component={RemoteControl} />
+    <Stack.Screen name="ScheduleOn" component={ScheduleOn} />
+    <Stack.Screen name="ScheduleOff" component={ScheduleOff} />
     </Stack.Navigator>
         </DeviceProvider>
 
