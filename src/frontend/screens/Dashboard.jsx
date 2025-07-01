@@ -12,8 +12,10 @@ const features = [
     icon: require('../assets/monitor.png'),
     screen: 'RealTimeMonitoring',
   },
-  { title: 'Remote Control Access', icon: require('../assets/remote.png') },
+  { title: 'Remote Control Access', icon: require('../assets/remote.png') ,screen: 'RemoteControl',},
   { title: 'Voice Control Integration', icon: require('../assets/mic.png') },
+  
+
   {
     title: 'Sleep Mode',
     icon: require('../assets/sleep.png'),
