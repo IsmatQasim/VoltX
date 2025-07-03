@@ -9,6 +9,7 @@ import Confirmation from '../screens/Confirmation';
 import Settings from '../screens/Settings';
 import Account from '../screens/Account';
 import { DeviceProvider } from '../context/DeviceContext';
+import EditHomeProfile from '../screens/EditHomeProfile';
 
 
 const Stack = createNativeStackNavigator();
@@ -29,6 +30,7 @@ export default function AppNavigator() {
       <Stack.Screen name="Dashboard" component={Dashboard} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="Account" component={Account} />
+      <Stack.Screen name="EditHomeProfile" component={EditHomeProfile} />
     </Stack.Navigator>
         </DeviceProvider>
 

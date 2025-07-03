@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
@@ -29,20 +30,29 @@ const Account = () => {
   const [showOld, setShowOld] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const user = auth().currentUser;
-    if (user) {
-      setEmail(user.email || '');
-      database()
-        .ref(`/users/${user.uid}/username`)
-        .once('value')
-        .then(snapshot => setUsername(snapshot.val() || 'User'))
-        .catch(error => {
-          console.error('Failed to fetch username:', error);
-          setUsername('User');
-        });
-    }
+    const fetchUserData = async () => {
+      try {
+        setIsLoading(true);
+        const user = auth().currentUser;
+        if (user) {
+          setEmail(user.email || '');
+          const snapshot = await database()
+            .ref(`/users/${user.uid}/username`)
+            .once('value');
+          setUsername(snapshot.val() || 'User');
+        }
+      } catch (error) {
+        console.error('Failed to fetch username:', error);
+        setUsername('User');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   const validatePassword = password => {
@@ -69,7 +79,7 @@ const Account = () => {
     if (!validatePassword(newPassword)) {
       Alert.alert(
         'Weak Password',
-        'Password must contain:\n- At least 8 characters\n- One uppercase letter\n- One lowercase letter\n- One special character'
+        'Password must contain:\n- At least 8 characters\n- One uppercase letter\n- One lowercase letter\n- One special character',
       );
       return;
     }
@@ -84,7 +94,7 @@ const Account = () => {
     try {
       const credential = firebase.auth.EmailAuthProvider.credential(
         user.email,
-        oldPassword
+        oldPassword,
       );
 
       await user.reauthenticateWithCredential(credential);
@@ -106,7 +116,7 @@ const Account = () => {
       } else if (error.code === 'auth/requires-recent-login') {
         Alert.alert(
           'Session Expired',
-          'Please log out and log back in before updating your password.'
+          'Please log out and log back in before updating your password.',
         );
       } else {
         Alert.alert('Error', error.message);
@@ -137,7 +147,7 @@ const Account = () => {
 
               Alert.alert(
                 'Account Deleted',
-                'Your account has been successfully deleted.'
+                'Your account has been successfully deleted.',
               );
               navigation.replace('Signup');
             } catch (error) {
@@ -145,7 +155,7 @@ const Account = () => {
               if (error.code === 'auth/requires-recent-login') {
                 Alert.alert(
                   'Error',
-                  'Please log out and log in again to delete your account.'
+                  'Please log out and log in again to delete your account.',
                 );
               } else {
                 Alert.alert('Error', error.message);
@@ -153,13 +163,33 @@ const Account = () => {
             }
           },
         },
-      ]
+      ],
     );
   };
 
+  if (isLoading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={28}
+              color={colors.text}
+            />
+          </TouchableOpacity>
+          <Text style={styles.heading}>Account</Text>
+        </View>
+        <View style={styles.loaderContent}>
+          <ActivityIndicator size="large" color={colors.accent} />
+          <Text style={styles.loadingText}>Loading your account..</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-     
       <View style={styles.headerRow}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <MaterialCommunityIcons
@@ -185,7 +215,6 @@ const Account = () => {
         </View>
       </View>
 
-      {/* Account Details */}
       <Text style={styles.sectionTitle}>Account Details</Text>
       <View style={styles.detailsCard}>
         {/* Old Password */}
@@ -205,13 +234,13 @@ const Account = () => {
           />
           <TouchableOpacity onPress={() => setShowOld(!showOld)}>
             <MaterialCommunityIcons
-             name={showNew ? 'eye-outline' : 'eye-off-outline'}
+              name={showOld ? 'eye-outline' : 'eye-off-outline'}
               size={20}
               color={colors.text}
             />
           </TouchableOpacity>
         </View>
-      
+
         <View style={styles.inputRow}>
           <MaterialCommunityIcons name="lock" size={20} color={colors.text} />
           <TextInput
@@ -248,7 +277,7 @@ const Account = () => {
           />
           <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
             <MaterialCommunityIcons
-              name={showNew ? 'eye-outline' : 'eye-off-outline'}
+              name={showConfirm ? 'eye-outline' : 'eye-off-outline'}
               size={20}
               color={colors.text}
             />
@@ -274,6 +303,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingTop: 30,
+  },
+  loaderContainer: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    paddingHorizontal: 20,
+    paddingTop: 30,
+  },
+  loaderContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: colors.text,
   },
   headerRow: {
     flexDirection: 'row',
