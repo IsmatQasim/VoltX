@@ -12,6 +12,7 @@ import EditHomeProfile from '../screens/EditHomeProfile';
 import RemoteControl from '../screens/RemoteControl';
 import { ScheduleOn, ScheduleOff } from '../screens/Schedule';
 import { DeviceProvider } from '../context/DeviceContext';
+import RealTimeMonitoring from '../screens/RealTimeMonitoring'; 
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,7 @@ export default function AppNavigator() {
         <Stack.Screen name="RemoteControl" component={RemoteControl} />
         <Stack.Screen name="ScheduleOn" component={ScheduleOn} />
         <Stack.Screen name="ScheduleOff" component={ScheduleOff} />
+        <Stack.Screen name="RealTimeMonitoring" component={RealTimeMonitoring} />
       </Stack.Navigator>
     </DeviceProvider>
   );
