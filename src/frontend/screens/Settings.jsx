@@ -77,7 +77,7 @@ const Settings = () => {
         <SettingItem
           iconName="home-outline"
           label="Home Profile"
-          onPress={() => navigation.navigate('HomeProfile')}
+          onPress={() => navigation.navigate('EditHomeProfile')}
         />
         <SettingItem
           iconName="file-document-outline"
