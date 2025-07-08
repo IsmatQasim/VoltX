@@ -36,6 +36,7 @@ export default function AppNavigator() {
         <Stack.Screen name="ScheduleOn" component={ScheduleOn} />
         <Stack.Screen name="ScheduleOff" component={ScheduleOff} />
         <Stack.Screen name="RealTimeMonitoring" component={RealTimeMonitoring} />
+              
       </Stack.Navigator>
     </DeviceProvider>
   );
