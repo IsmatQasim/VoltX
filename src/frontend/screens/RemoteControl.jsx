@@ -27,7 +27,6 @@ const durationMap = {
   '5 hours': 5 * 60 * 60 * 1000,
 };
 
-// ✅ NEW: Handle custom timer format like "00:02"
 const parseDuration = (timer) => {
   if (!timer) return 0;
   if (durationMap[timer]) return durationMap[timer];
@@ -159,7 +158,6 @@ const RemoteControl = () => {
     })));
   }, [roomAppliances, roomNames]);
 
-  // ✅ Timer countdown logic and switch
   useEffect(() => {
     const interval = setInterval(() => {
       setDeviceStatus(prev => {
@@ -245,7 +243,7 @@ const RemoteControl = () => {
     return (
       <View style={[styles.centered, { backgroundColor: colors.primary }]}>
         <ActivityIndicator size="large" color={colors.accent} />
-        <Text style={styles.loadingText}>Loading Remote Control...</Text>
+        <Text style={styles.loadingText}>Loading Remote Control</Text>
       </View>
     );
   }
@@ -259,7 +257,7 @@ const RemoteControl = () => {
           <Text style={styles.title}>Remote Control Access</Text>
           <NotificationBell isActive={bellActive} onToggle={() => setBellActive(!bellActive)} />
         </View>
-        <Text style={styles.subtitle}>Manage devices remotely</Text>
+        <Text style={styles.subtitle}>Access and manage devices remotely</Text>
         <View style={styles.topRow}>
           <View style={styles.pickerWrapper}>
             <DropDownPicker
@@ -305,7 +303,7 @@ const RemoteControl = () => {
               <Switch
                 value={d.status}
                 onValueChange={() => toggleDevice(d.room, d.dev, d.idx, d.status)}
-                trackColor={{ false: '#d2aa6d', true: '#d2aa6d' }}
+                trackColor={{ false: '#d3d3d3', true: '#d2aa6d' }}
                 thumbColor="#f4f3f4"
               />
               <TouchableOpacity onPress={() => nav.navigate(
@@ -341,9 +339,9 @@ const styles = StyleSheet.create({
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scrollContent: { paddingHorizontal: 16, paddingBottom: 80 },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: { fontSize: 28, fontWeight: '700', color: colors.text },
-  subtitle: { fontSize: 16, color: colors.link, marginVertical: 12 },
-  topRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  title: { fontSize: 25, fontWeight: '700', color: colors.text },
+  subtitle: { fontSize: 18, color: colors.link, marginVertical: 3 },
+  topRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 ,marginTop:10},
   pickerWrapper: { flex: 1, marginRight: 24, zIndex: 10 },
   picker: { backgroundColor: colors.secondary, borderColor: colors.text, borderWidth: 1, borderRadius: 8 },
   dropdown: { backgroundColor: colors.primary, borderColor: colors.text },
@@ -356,7 +354,7 @@ const styles = StyleSheet.create({
   deviceTime: { fontSize: 12, color: colors.link, marginLeft: 9 },
   toggleBlock: { alignItems: 'center', justifyContent: 'center', marginLeft: 8 },
   bottomBarContainer: { position: 'absolute', bottom: 0, left: 0, right: 0 },
-  loadingText: { marginTop: 12, fontSize: 14, color: colors.text, fontStyle: 'italic' },
+  loadingText: { marginTop: 12, fontSize: 14, color: colors.text  },
 });
 
 export default RemoteControl;
