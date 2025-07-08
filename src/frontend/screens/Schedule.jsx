@@ -58,7 +58,7 @@ const Schedule = ({ route, navigation, isOn }) => {
     const found = APPLIANCES.find(
       (item) => item.label.toLowerCase() === device?.toLowerCase()
     );
-    return found ? renderIcon(found.icon, 32) : <View style={{ width: 32 }} />;
+    return found ? renderIcon(found.icon, 24) : <View style={{ width: 32 }} />;
   };
 
   const updateRemoteControlData = async (updatedStatus) => {
@@ -113,7 +113,6 @@ const Schedule = ({ route, navigation, isOn }) => {
       return;
     }
 
-    // Handle "Other"
     if (selectedTime === 'Other') {
       const hh = parseInt(customHour) || 0;
       const mm = parseInt(customMinute) || 0;
@@ -181,8 +180,8 @@ const Schedule = ({ route, navigation, isOn }) => {
             <Switch
               value={enabled}
               onValueChange={setEnabled}
-              trackColor={{ false: '#d2aa6d', true: '#d2aa6d' }}
-              thumbColor="#fff"
+              trackColor={{ false: '#d3d3d3', true: '#d2aa6d' }}
+              thumbColor="#f4f3f4"
             />
           </View>
 
@@ -258,28 +257,22 @@ const Schedule = ({ route, navigation, isOn }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.primary },
   scrollContent: { padding: 20, paddingBottom: 120 },
-  title: { fontSize: 40, fontWeight: '700', marginBottom: 15, marginTop: 12, textAlign: 'center' },
+  title: { fontSize: 32, fontWeight: '700', marginBottom: 15, marginTop: 12, textAlign: 'center' },
   deviceHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, justifyContent: 'space-between' },
   iconContainer: { marginRight: 10 },
-  deviceLabel: { flex: 1, fontSize: 20, fontWeight: '600', color: colors.text },
-  roomName: { fontSize: 20, fontWeight: '600', color: colors.text },
+  deviceLabel: { flex: 1, fontSize: 18, fontWeight: '600', color: colors.text },
+  roomName: { fontSize: 18, fontWeight: '600', color: colors.text ,marginRight:12},
   card: { backgroundColor: colors.secondary, borderRadius: 10, padding: 20, marginBottom: 20 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   label: { fontSize: 22, fontWeight: '500' },
   subLabel: { marginTop: 14, fontSize: 18, fontWeight: '500' },
   optionRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 6 },
-  radio: {
-    width: 20, height: 20, borderRadius: 10,
-    borderWidth: 2, borderColor: colors.accent,
-    backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', marginRight: 10,
-  },
+  radio: {width: 20, height: 20, borderRadius: 10,borderWidth: 2, borderColor: colors.accent,
+  backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', marginRight: 10, },
   radioSelected: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#d2aa6d' },
   optionText: { fontSize: 16 },
   timeInputRow: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
-  timeInput: {
-    borderWidth: 1, borderColor: '#000', padding: 8,
-    borderRadius: 6, width: 60, textAlign: 'center', fontSize: 16, color: '#000',
-  },
+  timeInput: {borderWidth: 1, borderColor: '#000', padding: 8,borderRadius: 6, width: 60, textAlign: 'center', fontSize: 16, color: '#000',},
   divider: { height: 1, backgroundColor: '#000', marginVertical: 12 },
   buttonRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 1, marginRight: 7 },
   bottomBarContainer: { position: 'absolute', bottom: 0, left: 0, right: 0 }
