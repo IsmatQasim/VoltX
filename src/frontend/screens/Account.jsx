@@ -215,7 +215,7 @@ const Account = () => {
         </View>
       </View>
 
-      <Text style={styles.sectionTitle}>Account Details</Text>
+      <Text style={styles.sectionTitle}>Change Password</Text>
       <View style={styles.detailsCard}>
         {/* Old Password */}
         <View style={styles.inputRow}>

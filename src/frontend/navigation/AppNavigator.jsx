@@ -14,6 +14,8 @@ import { ScheduleOn, ScheduleOff } from '../screens/Schedule';
 import { DeviceProvider } from '../context/DeviceContext';
 import RealTimeMonitoring from '../screens/RealTimeMonitoring'; 
 import AlertSystemScreen from '../screens/AlertSystem';
+import SleepMode from '../screens/SleepMode'; 
+import VoiceControl from '../screens/VoiceControl';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,7 +39,9 @@ export default function AppNavigator() {
         <Stack.Screen name="ScheduleOn" component={ScheduleOn} />
         <Stack.Screen name="ScheduleOff" component={ScheduleOff} />
         <Stack.Screen name="RealTimeMonitoring" component={RealTimeMonitoring} />
-        <Stack.Screen name='AlertSystem' component={AlertSystemScreen} />
+        <Stack.Screen name="AlertSystem" component={AlertSystemScreen} />
+        <Stack.Screen name="SleepMode" component={SleepMode} />
+        <Stack.Screen name="VoiceControl" component={VoiceControl} />
       </Stack.Navigator>
     </DeviceProvider>
   );

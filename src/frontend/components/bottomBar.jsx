@@ -59,8 +59,10 @@ const styles = StyleSheet.create({
     width: 50,
   },
   bottomText: {
-    fontSize: 11,
+    fontSize: 12,
     marginTop: 4,
+    color:colors.text,
+
   },
   bottomIcon: {
     width: 24,
