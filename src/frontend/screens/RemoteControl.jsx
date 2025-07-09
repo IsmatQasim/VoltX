@@ -335,7 +335,7 @@ const RemoteControl = () => {
 
 const styles = StyleSheet.create({
   fullScreen: { flex: 1, backgroundColor: colors.primary },
-  topFixed: { padding: 16, backgroundColor: colors.primary, zIndex: 2 },
+  topFixed: { padding: 17, backgroundColor: colors.primary, zIndex: 2, marginTop:10 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scrollContent: { paddingHorizontal: 16, paddingBottom: 80 },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
