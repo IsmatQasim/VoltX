@@ -42,6 +42,33 @@ const AlertSystem = () => {
   const [currentDeviceKey, setCurrentDeviceKey] = useState(null);
   const [deviceAlertTriggered, setDeviceAlertTriggered] = useState({});
 
+
+  // Auto-save whenever important alert states change
+useEffect(() => {
+  const saveSettings = async () => {
+    try {
+      const userId = auth().currentUser?.uid;
+      if (!userId) return;
+
+      const settings = {
+        alertEnabled,
+        affectedDevices,
+        deviceTimers,
+        deviceAlertSettings,
+        updatedAt: firestore.FieldValue.serverTimestamp(),
+      };
+
+      await firestore().collection('AlertSettings').doc(userId).set(settings, { merge: true });
+      console.log("✅ Auto-saved alert settings");
+    } catch (error) {
+      console.error("❌ Error auto-saving alert settings:", error);
+    }
+  };
+
+  saveSettings();
+}, [alertEnabled, affectedDevices, deviceTimers, deviceAlertSettings]);
+
+
   const getCountValue = deviceData => {
     if (typeof deviceData === 'number') return deviceData;
     if (typeof deviceData === 'object' && deviceData !== null) {

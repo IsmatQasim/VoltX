@@ -14,6 +14,10 @@ import { ScheduleOn, ScheduleOff } from '../screens/Schedule';
 import { DeviceProvider } from '../context/DeviceContext';
 import RealTimeMonitoring from '../screens/RealTimeMonitoring'; 
 import AlertSystemScreen from '../screens/AlertSystem';
+import AiRecommendations from '../screens/AiRecommendations'
+import AIBudgetPlanner from '../screens/AiBudget';
+import Forecast from '../screens/Forecast';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +42,11 @@ export default function AppNavigator() {
         <Stack.Screen name="ScheduleOff" component={ScheduleOff} />
         <Stack.Screen name="RealTimeMonitoring" component={RealTimeMonitoring} />
         <Stack.Screen name='AlertSystem' component={AlertSystemScreen} />
+        <Stack.Screen name='AiRecommendations' component={AiRecommendations}/>
+        <Stack.Screen name='AiBudget' component={AIBudgetPlanner}/>
+        <Stack.Screen name='Forecast' component={Forecast}/>
+
+
       </Stack.Navigator>
     </DeviceProvider>
   );

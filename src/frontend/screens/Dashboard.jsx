@@ -29,11 +29,16 @@ const features = [
   {
     title: 'Smart AI Energy Recommendation',
     icon: require('../assets/bulb.png'),
+    screen: 'AiRecommendations',
   },
-  { title: 'Energy Saving Forecast', icon: require('../assets/save.png') },
+  { title: 'Energy Saving Forecast',
+     icon: require('../assets/save.png'),
+    screen: 'Forecast',
+   },
   {
     title: 'AI Based Energy Budget Planner',
     icon: require('../assets/budget.png'),
+    screen: 'AiBudget',
   },
 ];
 
