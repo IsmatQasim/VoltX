@@ -10,10 +10,12 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { LineChart } from 'react-native-chart-kit';
+import DropDownPicker from 'react-native-dropdown-picker';
+
 import BottomBar from '../components/bottomBar';
 import colors from '../contants/colors';
 import { renderIcon, APPLIANCES } from '../contants/data';
-import DropDownPicker from 'react-native-dropdown-picker';
+import NotificationBell from '../components/notificationBell';
 
 const screenWidth = Dimensions.get('window').width;
 const timeRanges = ['Current', 'Today', 'Weekly', 'Monthly'];
@@ -21,18 +23,18 @@ const timeRanges = ['Current', 'Today', 'Weekly', 'Monthly'];
 const RealTimeMonitoring = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState('Current');
-  const [rooms, setRooms] = useState([]); 
-  const [roomNames, setRoomNames] = useState({}); 
+  const [rooms, setRooms] = useState([]);
+  const [roomNames, setRoomNames] = useState({});
   const [appliances, setAppliances] = useState([]);
   const [energyData, setEnergyData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [bellActive, setBellActive] = useState(false);
 
-  // new states for dropdown
   const [openRoom, setOpenRoom] = useState(false);
   const [roomItems, setRoomItems] = useState([]);
   const [openTime, setOpenTime] = useState(false);
   const [timeItems, setTimeItems] = useState(
-    timeRanges.map(range => ({ label: range, value: range }))
+    timeRanges.map(range => ({ label: range, value: range })),
   );
 
   useEffect(() => {
@@ -43,6 +45,7 @@ const RealTimeMonitoring = () => {
           .collection('UserHomeProfile')
           .doc(userId)
           .get();
+
         if (doc.exists) {
           const data = doc.data();
           const savedRooms = data.selectedRooms || [];
@@ -51,10 +54,13 @@ const RealTimeMonitoring = () => {
           setRooms(savedRooms);
           setRoomNames(roomNamesMap);
           setSelectedRoom(savedRooms[0] || null);
-          setRoomItems(savedRooms.map(room => ({
-            label: roomNamesMap[room] || room,
-            value: room,
-          })));
+       
+          setRoomItems(
+            savedRooms.map(room => ({
+              label: (roomNamesMap[room] || room).replace(/_/g, ' '),
+              value: room,
+            })),
+          );
 
           const allAppliances = [];
           Object.entries(data.roomAppliances || {}).forEach(
@@ -74,7 +80,7 @@ const RealTimeMonitoring = () => {
                   const displayName =
                     count > 1 ? `${deviceName} ${i}` : deviceName;
                   allAppliances.push({
-                    room, 
+                    room,
                     name: displayName,
                     originalName: deviceName,
                     active: true,
@@ -91,6 +97,7 @@ const RealTimeMonitoring = () => {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
@@ -122,20 +129,37 @@ const RealTimeMonitoring = () => {
 
   if (loading)
     return (
-      <ActivityIndicator
-        size="large"
-        color={colors.accent}
-        style={{ flex: 1 }}
-      />
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.primary,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <ActivityIndicator size="large" color={colors.accent} />
+        <Text style={{ color: colors.text, marginTop: 12, fontSize: 16 }}>
+          Loading real time energy...
+        </Text>
+      </View>
     );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Real-Time Energy Monitoring</Text>
+      {/* Title and Bell */}
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>Real-Time Energy Monitoring</Text>
+        <NotificationBell
+          isActive={bellActive}
+          onToggle={() => setBellActive(!bellActive)}
+        />
+      </View>
+
       <Text style={styles.subtitle}>
         Continuous real-time energy usage tracking
       </Text>
 
+      {/* Dropdowns */}
       <View style={styles.topRow}>
         <View style={styles.pickerWrapper}>
           <DropDownPicker
@@ -143,26 +167,12 @@ const RealTimeMonitoring = () => {
             value={selectedRoom}
             items={roomItems}
             setOpen={setOpenRoom}
-            setValue={(val) => setSelectedRoom(val)}
+            setValue={setSelectedRoom}
             setItems={setRoomItems}
-            style={{
-              backgroundColor: colors.secondary,
-              borderColor: colors.text,
-              borderWidth: 1,
-              borderRadius: 8,
-            }}
-            dropDownContainerStyle={{
-              backgroundColor: colors.primary,
-              borderColor: colors.text,
-            }}
-            textStyle={{
-              fontSize: 16,
-              fontWeight: '700',
-              color: colors.text,
-            }}
-            arrowIconStyle={{
-              tintColor: 'black',
-            }}
+            style={styles.dropdown}
+            dropDownContainerStyle={styles.dropdownContainer}
+            textStyle={styles.dropdownText}
+            arrowIconStyle={{ tintColor: 'black' }}
             placeholder="Select Room"
           />
         </View>
@@ -173,31 +183,18 @@ const RealTimeMonitoring = () => {
             value={selectedTimeRange}
             items={timeItems}
             setOpen={setOpenTime}
-            setValue={(val) => setSelectedTimeRange(val)}
+            setValue={setSelectedTimeRange}
             setItems={setTimeItems}
-            style={{
-              backgroundColor: colors.secondary,
-              borderColor: colors.text,
-              borderWidth: 1,
-              borderRadius: 8,
-            }}
-            dropDownContainerStyle={{
-              backgroundColor: colors.primary,
-              borderColor: colors.text,
-            }}
-            textStyle={{
-              fontSize: 16,
-              fontWeight: '700',
-              color: colors.text,
-            }}
-            arrowIconStyle={{
-              tintColor: 'black',
-            }}
+            style={styles.dropdown}
+            dropDownContainerStyle={styles.dropdownContainer}
+            textStyle={styles.dropdownText}
+            arrowIconStyle={{ tintColor: 'black' }}
             placeholder="Select Time Range"
           />
         </View>
       </View>
 
+      {/* Line Chart */}
       <LineChart
         data={{ labels: chartLabels, datasets: [{ data: energyData }] }}
         width={screenWidth - 40}
@@ -221,34 +218,39 @@ const RealTimeMonitoring = () => {
 
       <Text style={styles.heading}>{selectedTimeRange} Appliances</Text>
 
-      <FlatList
-        data={filteredAppliances}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => {
-          const found = APPLIANCES.find(
-            app => app.label.toLowerCase() === item.originalName.toLowerCase(),
-          );
-          return (
-            <View style={styles.applianceItem}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {found && renderIcon(found.icon, 22, colors.text)}
-                <View style={{ marginLeft: 8 }}>
-                  <Text style={styles.applianceText}>{item.name}</Text>
-                  <Text style={styles.applianceEnergy}>
-                    Usage: {item.energy} kWh
-                  </Text>
+      {/* Scrollable FlatList */}
+      <View style={{ flex: 1 }}>
+        <FlatList
+          data={filteredAppliances}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => {
+            const found = APPLIANCES.find(
+              app =>
+                app.label.toLowerCase() === item.originalName.toLowerCase(),
+            );
+            return (
+              <View style={styles.applianceItem}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {found && renderIcon(found.icon, 22, colors.text)}
+                  <View style={{ marginLeft: 8 }}>
+                    <Text style={styles.applianceText}>{item.name}</Text>
+                    <Text style={styles.applianceEnergy}>
+                      Usage: {item.energy} kWh
+                    </Text>
+                  </View>
                 </View>
+                <Text style={{ color: item.active ? 'green' : 'red' }}>
+                  {item.active ? 'Active' : 'Inactive'}
+                </Text>
               </View>
-              <Text style={{ color: item.active ? 'green' : 'red' }}>
-                {item.active ? 'Active' : 'Inactive'}
-              </Text>
-            </View>
-          );
-        }}
-        ListEmptyComponent={
-          <Text style={styles.noAppliances}>No appliances in this room</Text>
-        }
-      />
+            );
+          }}
+          ListEmptyComponent={
+            <Text style={styles.noAppliances}>No appliances in this room</Text>
+          }
+          contentContainerStyle={{ paddingBottom: 50 }}
+        />
+      </View>
 
       <View style={styles.bottomBarContainer}>
         <BottomBar />
@@ -260,23 +262,68 @@ const RealTimeMonitoring = () => {
 export default RealTimeMonitoring;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.primary, padding: 20 },
-  title: { fontSize: 25, fontWeight: '700', color: colors.text, marginBottom: 6, marginTop: 10 },
-  subtitle: { fontSize: 16, color: colors.link, marginBottom: 16 },
+  container: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    padding: 20,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 25,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 6,
+    marginTop: 10,
+    flexShrink: 1,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: colors.link,
+    marginBottom: 16,
+  },
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
-    zIndex: 10, // needed for dropdown overlap
+    zIndex: 10,
   },
   pickerWrapper: {
     flex: 1,
     marginRight: 12,
     zIndex: 10,
   },
-  heading: { fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 5 },
-  totalText: { color: colors.text, marginVertical: 5, fontSize: 15 },
+  dropdown: {
+    backgroundColor: colors.secondary,
+    borderColor: colors.text,
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  dropdownContainer: {
+    backgroundColor: colors.primary,
+    borderColor: colors.text,
+  },
+  dropdownText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  heading: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 5,
+    color: colors.text,
+  },
+  totalText: {
+    color: colors.text,
+    marginVertical: 5,
+    fontSize: 15,
+  },
   applianceItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -285,9 +332,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
   },
-  applianceText: { color: colors.text, fontWeight: '500' },
-  applianceEnergy: { color: colors.link, fontSize: 12, marginTop: 2 },
-  noAppliances: { textAlign: 'center', color: colors.link, marginTop: 10 },
+  applianceText: {
+    color: colors.text,
+    fontWeight: '500',
+  },
+  applianceEnergy: {
+    color: colors.link,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  noAppliances: {
+    textAlign: 'center',
+    color: colors.link,
+    marginTop: 10,
+  },
   bottomBarContainer: {
     position: 'absolute',
     bottom: 0,
@@ -295,4 +353,3 @@ const styles = StyleSheet.create({
     right: 0,
   },
 });
-

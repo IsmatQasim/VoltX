@@ -1,4 +1,3 @@
-// src/screens/Dashboard.js
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -13,7 +12,7 @@ const features = [
     screen: 'RealTimeMonitoring',
   },
   { title: 'Remote Control Access', icon: require('../assets/remote.png') ,screen: 'RemoteControl',},
-  { title: 'Voice Control Integration', icon: require('../assets/mic.png') },
+  { title: 'Voice Control Integration', icon: require('../assets/mic.png')  ,screen: 'VoiceControl',},
   
 
   {
@@ -133,6 +132,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginLeft: 10,
     flexShrink: 1,
+    color:colors.text,
   },
   bottomBarContainer: {
     position: 'absolute',

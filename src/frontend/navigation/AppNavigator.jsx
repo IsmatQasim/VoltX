@@ -14,10 +14,11 @@ import { ScheduleOn, ScheduleOff } from '../screens/Schedule';
 import { DeviceProvider } from '../context/DeviceContext';
 import RealTimeMonitoring from '../screens/RealTimeMonitoring'; 
 import AlertSystemScreen from '../screens/AlertSystem';
-import AiRecommendations from '../screens/AiRecommendations'
+import AiRecommendations from '../screens/AiRecommendations';
 import AIBudgetPlanner from '../screens/AiBudget';
 import Forecast from '../screens/Forecast';
-
+import SleepMode from '../screens/SleepMode'; 
+import VoiceControl from '../screens/VoiceControl';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,12 +42,12 @@ export default function AppNavigator() {
         <Stack.Screen name="ScheduleOn" component={ScheduleOn} />
         <Stack.Screen name="ScheduleOff" component={ScheduleOff} />
         <Stack.Screen name="RealTimeMonitoring" component={RealTimeMonitoring} />
-        <Stack.Screen name='AlertSystem' component={AlertSystemScreen} />
-        <Stack.Screen name='AiRecommendations' component={AiRecommendations}/>
-        <Stack.Screen name='AiBudget' component={AIBudgetPlanner}/>
-        <Stack.Screen name='Forecast' component={Forecast}/>
-
-
+        <Stack.Screen name="AlertSystem" component={AlertSystemScreen} />
+        <Stack.Screen name="AiRecommendations" component={AiRecommendations}/>
+        <Stack.Screen name="AiBudget" component={AIBudgetPlanner}/>
+        <Stack.Screen name="Forecast" component={Forecast}/>
+        <Stack.Screen name="SleepMode" component={SleepMode} />
+        <Stack.Screen name="VoiceControl" component={VoiceControl} />
       </Stack.Navigator>
     </DeviceProvider>
   );
